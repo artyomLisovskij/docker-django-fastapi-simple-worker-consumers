@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <title>just test</title>
+        
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    </head>
+    <body>
+        <input id="some_data" type="text" placeholder="input some text here to uppercase by backend">
+        <button onclick="executer()">execute</button>
+
+        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script><!-- for toastr only -->
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+        <script src="https://cdn.socket.io/4.1.2/socket.io.min.js" integrity="sha384-toS6mmwu70G0fw54EGlWWeA4z3dyJ+dlXBtSURSKN4vyRFOcxd3Bzjj/AoOwY+Rg" crossorigin="anonymous"></script>
+        <script type="text/javascript">
+            var socket;
+            function startWebsocket() {
+                socket = new WebSocket('ws://localhost:8000/ws/');
+
+                socket.onmessage = function(e){
+                    toastr.info('Task completed: ' + e.data);
+                }
+
+                socket.onclose = function(){
+                    // connection closed, discard old websocket and create a new one in 5s
+                    socket = null;
+                    setTimeout(startWebsocket, 1000);
+                }
+            }
+
+            startWebsocket();
+            
+            toastr.options = {
+                "progressBar": true,
+                "debug": false,
+                "newestOnTop": true,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "50000",
+                "extendedTimeOut": "10000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+
+            async function executer() {
+                
+                let url = "/api/new_task/?some_data=" + document.getElementById('some_data').value;
+                let response = await fetch(url);
+                response = await response.json();
+                toastr.info('Subscribe to channel ' + response.channel);
+                socket.send(JSON.stringify({'action': 'subscribe', 'value': response.channel.toString()}));
+                toastr.info('Waiting for task execution');
+            };
+
+            
+        </script>
+    </body>
+</html>
