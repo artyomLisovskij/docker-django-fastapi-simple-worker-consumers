@@ -11,13 +11,13 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 from pathlib import Path
 import os
+from dotenv import dotenv_values
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "i@dpxlb-$zm!bwldm*1231231232#)2*$)rb1u@5nwmcss"
+config = dotenv_values(".env")
+SECRET_KEY = config["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False

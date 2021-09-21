@@ -15,6 +15,7 @@ services:
     command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python3 manage.py collectstatic --no-input; python3 manage.py migrate; uvicorn mysite.asgi:application --port 8000 --host 0.0.0.0'
     volumes:
       - static:/app/staticfiles
+      - ./.env:/app/.env
     depends_on:
       - db
     restart: on-failure
@@ -25,8 +26,11 @@ services:
     depends_on:
       - db
       - wsify
+      - redis
     restart: on-failure
-    
+    volumes:
+      - ./.env:/app/.env
+
   # pgadmin:
   #   image: dpage/pgadmin4
   #   environment:
@@ -58,9 +62,19 @@ services:
     build:
       context: .
       dockerfile: worker_runner/Dockerfile
+    volumes:
+      - ./.env:/app/.env
     depends_on:
       - api
     
+  redis:
+    image: redis:alpine
+    volumes:
+      - redis_data:/data
+  
 volumes:
   postgresql-data:
   static:
+  redis_data:
+    external: false
+

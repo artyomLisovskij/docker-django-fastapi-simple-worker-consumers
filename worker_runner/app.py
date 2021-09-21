@@ -1,7 +1,9 @@
 import requests
 import time
+from dotenv import dotenv_values
 
-INTERNAL_CRON_API_KEY = 'testpassword'
+config = dotenv_values(".env")
+INTERNAL_CRON_API_KEY = config["INTERNAL_CRON_API_KEY"]
 
 if __name__ == "__main__":
     while True:
